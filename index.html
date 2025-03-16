@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σύνδεσμος</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .link {
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        .link:hover {
+            background-color: #45a049;
+        }
+        .loading-screen, .slideshow {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-screen.active, .slideshow.active {
+            display: flex;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+        }
+        .loading-screen {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .loading-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .goat-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        .car-image {
+            width: 150px;
+            height: auto;
+        }
+        .car-image.left {
+            transform: scaleX(-1);
+        }
+        .loading-image {
+            max-width: 60%;
+            max-height: 40vh;
+            border-radius: 10px;
+        }
+        .f16-image {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: -20px;
+            animation: fly 3s ease-in-out infinite;
+        }
+        .loading-text {
+            color: white;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .slideshow {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .slideshow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('image.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(8px) brightness(0.3);
+            transform: scale(1.1);
+            z-index: -1;
+            animation: slowZoom 20s ease-in-out infinite alternate;
+        }
+        @keyframes slowZoom {
+            from { transform: scale(1.1); }
+            to { transform: scale(1.2); }
+        }
+        .slideshow-title {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            animation: glow 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+        .slide-container {
+            position: relative;
+            z-index: 1;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 80%;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.5s ease-in-out;
+        }
+        .slide-container.active {
+            display: flex;
+            transform: scale(1);
+            opacity: 1;
+        }
+        .slide {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+        .slide:hover {
+            transform: scale(1.02);
+        }
+        .slide-text {
+            position: relative;
+            z-index: 1;
+            color: white;
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: center;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.75));
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.5s forwards 0.3s;
+        }
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .slideshow-nav {
+            position: fixed;
+            bottom: 30px;
+            display: flex;
+            gap: 20px;
+            z-index: 2;
+        }
+        .nav-button {
+            padding: 12px 25px;
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .nav-button:hover {
+            background: linear-gradient(145deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        .nav-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .explosion {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,87,34,0.8) 0%, rgba(255,87,34,0) 70%);
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+            pointer-events: none;
+        }
+        
+        .flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        .flash.active {
+            animation: flash 0.2s ease-out;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(0);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .loading-screen {
+            overflow: hidden;
+        }
+
+        @keyframes fly {
+            0% { transform: translateX(-50px) rotate(-5deg); }
+            50% { transform: translateX(50px) rotate(5deg); }
+            100% { transform: translateX(-50px) rotate(-5deg); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+            50% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.5); }
+        }
+
+        .floating-hearts {
+            position: fixed;
+            width: 300px;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+            display: none;
+            overflow: visible;
+            padding: 50px;
+        }
+
+        .slideshow.active .floating-hearts {
+            display: block;
+        }
+
+        .floating-hearts.left {
+            left: 0;
+        }
+
+        .floating-hearts.right {
+            right: 0;
+        }
+
+        .heart {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #ff0000;
+            transform: rotate(45deg);
+            opacity: 0;
+            animation: floatHeartUp 4s linear infinite;
+            bottom: -100px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #ff0000;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .heart::before {
+            left: -20px;
+            top: 0;
+        }
+
+        .heart::after {
+            top: -20px;
+            left: 0;
+        }
+
+        .heart img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: rotate(-45deg);
+            z-index: 2;
+            opacity: 0.9;
+            border-radius: 50%;
+        }
+
+        @keyframes floatHeartUp {
+            0% {
+                transform: rotate(45deg);
+                opacity: 0;
+                bottom: -100px;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+                transform: rotate(45deg);
+            }
+            100% {
+                transform: rotate(45deg) scale(1.2);
+                opacity: 0;
+                bottom: 100vh;
+            }
+        }
+
+        .heart:nth-child(1) { left: 20%; animation-delay: 0s; }
+        .heart:nth-child(2) { left: 60%; animation-delay: 0.2s; }
+        .heart:nth-child(3) { left: 40%; animation-delay: 0.4s; }
+        .heart:nth-child(4) { left: 80%; animation-delay: 0.6s; }
+        .heart:nth-child(5) { left: 30%; animation-delay: 0.8s; }
+        .heart:nth-child(6) { left: 70%; animation-delay: 1.0s; }
+        .heart:nth-child(7) { left: 50%; animation-delay: 1.2s; }
+        .heart:nth-child(8) { left: 25%; animation-delay: 1.4s; }
+        .heart:nth-child(9) { left: 65%; animation-delay: 1.6s; }
+        .heart:nth-child(10) { left: 45%; animation-delay: 1.8s; }
+        .heart:nth-child(11) { left: 75%; animation-delay: 2.0s; }
+        .heart:nth-child(12) { left: 35%; animation-delay: 2.2s; }
+        .heart:nth-child(13) { left: 55%; animation-delay: 2.4s; }
+        .heart:nth-child(14) { left: 85%; animation-delay: 2.6s; }
+        .heart:nth-child(15) { left: 15%; animation-delay: 2.8s; }
+    </style>
+</head>
+<body>
+    <div class="flash" id="flash"></div>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <img src="f16.png" alt="F16 Fighter" class="f16-image">
+            <div class="goat-container">
+                <img src="fiat-removebg-preview.png" alt="Fiat Car Left" class="car-image left">
+                <img src="476485962_1252294782981704_2220845771088100435_n.jpg" alt="Relaxing goat" class="loading-image">
+                <img src="fiat-removebg-preview.png" alt="Fiat Car Right" class="car-image">
+            </div>
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Φορτώνει...</div>
+        </div>
+    </div>
+
+    <div class="slideshow" id="slideshow">
+        <div class="floating-hearts left">
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+        </div>
+        <div class="floating-hearts right">
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+            <div class="heart"><img src="" alt="Random slide"></div>
+        </div>
+        <h1 class="slideshow-title">Ο ΚΑΤΣΙΚΑΣ – ΕΝΑ ΦΑΙΝΟΜΕΝΟ</h1>
+        
+        <div class="slide-container">
+            <img src="1.png" alt="Slide 1" class="slide">
+            <div class="slide-text">
+                Ο Κατσίκας δεν είναι απλά ένας φίλος. Είναι εμπειρία, τρόπος ζωής, φαινόμενο. Από τη στιγμή που τον γνωρίζεις, ξέρεις πως η καθημερινότητά σου δεν θα είναι ποτέ ίδια.
+            </div>
+        </div>
+
+        <div class="slide-container">
+            <img src="2.png" alt="Slide 2" class="slide">
+            <div class="slide-text">
+                Πρώτα απ' όλα, ο Κατσίκας είναι αστείος. Και δεν μιλάμε για απλό χιούμορ. Μιλάμε για γκριμάτσες που θα μπορούσαν να γίνουν memes, εκφράσεις προσώπου που θα ζήλευε και ο Jim Carrey, και ατάκες που σε κάνουν να γελάς μέχρι δακρύων. Μερικές φορές, το μόνο που χρειάζεται είναι ένα βλέμμα του, και ξέρεις πως κάτι τρελό πρόκειται να συμβεί.
+            </div>
+        </div>
+
+        <div class="slide-container">
+            <img src="3.png" alt="Slide 3" class="slide">
+            <div class="slide-text">
+                Αν τον δεις να οδηγεί, θα καταλάβεις ότι το στυλ του είναι μοναδικό. Οδηγεί ένα παλιό Fiat Punto – ένα όχημα που έχει περάσει από πολλά, αλλά αντέχει, όπως και ο ίδιος. Μέσα στο Punto του, ο Κατσίκας είναι βασιλιάς. Παίζει μουσική στη διαπασών, κάνει σχόλια για τους άλλους οδηγούς, και μερικές φορές απλά… θολώνει. Δεν ξέρουμε τι ακριβώς συμβαίνει εκείνες τις στιγμές, αλλά είναι σαν να μπαίνει σε μια άλλη διάσταση. Ένα βλέμμα χαμένο στο άπειρο, ένα κενό με νόημα, μια προσωρινή έξοδος από την πραγματικότητα.
+
+                Και μετά ξαναμπαίνει. Και λέει κάτι τόσο αστείο που ξεχνάς ό,τι έγινε πριν.
+            </div>
+        </div>
+
+        <div class="slide-container">
+            <img src="4.jpg" alt="Slide 4" class="slide">
+            <div class="slide-text">
+                Ο Κατσίκας είναι ένας άνθρωπος που, αν τον έχεις φίλο, ξέρεις ότι η ζωή σου δεν θα είναι ποτέ βαρετή. Είναι εκεί για να σου φτιάξει τη μέρα, να σε κάνει να γελάσεις όταν δεν το περιμένεις, και να σου υπενθυμίζει ότι ακόμα και ένα Fiat Punto μπορεί να γίνει όχημα περιπέτειας.
+
+                Ζήτω ο Κατσίκας! 🚗💨
+            </div>
+        </div>
+
+        <div class="slideshow-nav">
+            <button class="nav-button" onclick="prevSlide()">Προηγούμενο</button>
+            <button class="nav-button" onclick="nextSlide()">Επόμενο</button>
+        </div>
+    </div>
+    
+    <a class="link" onclick="showLoadingScreen()">NIKOSGKOMENESKATSIKAS</a>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide-container');
+
+        function showSlide(index) {
+            // If we're on the last slide and trying to go next, close the window
+            if (currentSlide === slides.length - 1 && index > currentSlide) {
+                window.close();
+                return;
+            }
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            currentSlide = (index + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.style.left = x + 'px';
+            explosion.style.top = y + 'px';
+            document.getElementById('loadingScreen').appendChild(explosion);
+            
+            // Random selection of explosion sounds
+            const explosionSounds = [
+                'https://assets.mixkit.co/active_storage/sfx/2400/2400-preview.mp3', // Big explosion
+                'https://assets.mixkit.co/active_storage/sfx/2399/2399-preview.mp3', // Medium explosion
+                'https://assets.mixkit.co/active_storage/sfx/2398/2398-preview.mp3'  // Small explosion
+            ];
+            const explosionSound = new Audio(explosionSounds[Math.floor(Math.random() * explosionSounds.length)]);
+            explosionSound.volume = 0.5; // Increased volume for explosions
+            explosionSound.play().catch(error => console.log("Explosion sound failed:", error));
+
+            setTimeout(() => {
+                explosion.remove();
+                explosionSound.pause();
+                explosionSound.currentTime = 0;
+            }, 1000);
+        }
+
+        function createFlash() {
+            const flash = document.getElementById('flash');
+            flash.classList.add('active');
+            setTimeout(() => flash.classList.remove('active'), 200);
+        }
+
+        function playWarAmbience() {
+            // Create ambient war sounds - only gunfire and distant explosions
+            const sounds = [
+                {
+                    audio: new Audio('https://assets.mixkit.co/active_storage/sfx/2411/2411-preview.mp3'), // Machine gun
+                    interval: 1500 // More frequent gunfire
+                },
+                {
+                    audio: new Audio('https://assets.mixkit.co/active_storage/sfx/2401/2401-preview.mp3'), // Distant explosion
+                    interval: 2500 // More frequent explosions
+                }
+            ];
+
+            // Set volume for ambient sounds - increased volume
+            sounds.forEach(sound => {
+                sound.audio.volume = 0.4;
+            });
+
+            // Create intervals for each sound
+            const intervals = sounds.map(sound => {
+                sound.audio.play().catch(error => console.log("Ambient sound failed:", error));
+                return setInterval(() => {
+                    if (document.getElementById('loadingScreen').classList.contains('active')) {
+                        sound.audio.currentTime = 0;
+                        sound.audio.play().catch(error => console.log("Ambient sound failed:", error));
+                    }
+                }, sound.interval);
+            });
+
+            // Return array of intervals and audio elements
+            return {
+                intervals: intervals,
+                audioElements: sounds.map(s => s.audio)
+            };
+        }
+
+        function addWarEffects() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            
+            // Start ambient war sounds
+            const warSounds = playWarAmbience();
+            
+            // Create random explosions
+            const effectsInterval = setInterval(() => {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                createExplosion(x, y);
+                createFlash();
+                loadingScreen.classList.add('shake');
+                setTimeout(() => loadingScreen.classList.remove('shake'), 500);
+            }, 800);
+
+            // Return all intervals and audio elements
+            return {
+                effectsInterval: effectsInterval,
+                warSounds: warSounds
+            };
+        }
+
+        function showLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const slideshow = document.getElementById('slideshow');
+            const link = document.querySelector('.link');
+            
+            // Hide the link
+            link.style.display = 'none';
+            
+            loadingScreen.classList.add('active');
+            const effects = addWarEffects();
+            
+            setTimeout(() => {
+                // Fade out war sounds gradually
+                effects.warSounds.audioElements.forEach(audio => {
+                    // Create fade out effect
+                    const fadeInterval = setInterval(() => {
+                        if (audio.volume > 0.02) {
+                            audio.volume -= 0.02;
+                        } else {
+                            clearInterval(fadeInterval);
+                            audio.pause();
+                            audio.currentTime = 0;
+                        }
+                    }, 50);
+                });
+
+                // Clear all intervals after fade out
+                setTimeout(() => {
+                    clearInterval(effects.effectsInterval);
+                    effects.warSounds.intervals.forEach(interval => clearInterval(interval));
+                    
+                    // Remove any remaining effects
+                    document.querySelectorAll('.explosion').forEach(el => el.remove());
+                    document.getElementById('flash').classList.remove('active');
+                    loadingScreen.classList.remove('shake');
+                    
+                    // Smooth transition between screens
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.classList.remove('active');
+                        slideshow.classList.add('active');
+                        setTimeout(() => {
+                            slideshow.style.opacity = '1';
+                            updateFloatingHearts();
+                        }, 50);
+                        showSlide(0);
+                    }, 1000);
+                }, 1000);
+            }, 3000);
+        }
+
+        function updateFloatingHearts() {
+            const slideImages = ['1.png', '2.png', '3.png', '4.jpg'];
+            const hearts = document.querySelectorAll('.heart img');
+            
+            hearts.forEach(heartImg => {
+                const randomImage = slideImages[Math.floor(Math.random() * slideImages.length)];
+                heartImg.src = randomImage;
+            });
+
+            // Update hearts every 5 seconds
+            setInterval(() => {
+                hearts.forEach(heartImg => {
+                    const randomImage = slideImages[Math.floor(Math.random() * slideImages.length)];
+                    heartImg.src = randomImage;
+                });
+            }, 5000);
+        }
+    </script>
+</body>
+</html> 
