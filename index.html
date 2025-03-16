@@ -388,6 +388,154 @@
         .heart:nth-child(13) { left: 55%; animation-delay: 2.4s; }
         .heart:nth-child(14) { left: 85%; animation-delay: 2.6s; }
         .heart:nth-child(15) { left: 15%; animation-delay: 2.8s; }
+
+        /* Mobile Responsive Design */
+        @media screen and (max-width: 768px) {
+            .loading-image {
+                max-width: 80%;
+                max-height: 30vh;
+            }
+
+            .car-image {
+                width: 80px;
+            }
+
+            .f16-image {
+                max-width: 150px;
+            }
+
+            .loading-text {
+                font-size: 20px;
+            }
+
+            .slideshow-title {
+                font-size: 24px;
+                padding: 0 15px;
+            }
+
+            .slide-container {
+                max-width: 95%;
+            }
+
+            .slide {
+                max-height: 40vh;
+            }
+
+            .slide-text {
+                font-size: 16px;
+                padding: 15px;
+                margin: 15px 10px;
+            }
+
+            .nav-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .slideshow-nav {
+                bottom: 20px;
+            }
+
+            .floating-hearts {
+                width: 100px;
+                padding: 20px;
+            }
+
+            .heart {
+                width: 30px;
+                height: 30px;
+            }
+
+            .heart::before,
+            .heart::after {
+                width: 30px;
+                height: 30px;
+            }
+
+            .heart::before {
+                left: -15px;
+            }
+
+            .heart::after {
+                top: -15px;
+            }
+
+            .goat-container {
+                gap: 15px;
+                margin: 10px 0;
+            }
+
+            /* Adjust heart positions for mobile */
+            .heart:nth-child(1) { left: 10%; }
+            .heart:nth-child(2) { left: 40%; }
+            .heart:nth-child(3) { left: 70%; }
+            .heart:nth-child(4) { left: 25%; }
+            .heart:nth-child(5) { left: 55%; }
+            .heart:nth-child(6) { left: 85%; }
+            .heart:nth-child(7) { left: 15%; }
+            .heart:nth-child(8) { left: 45%; }
+            .heart:nth-child(9) { left: 75%; }
+            .heart:nth-child(10) { left: 30%; }
+            .heart:nth-child(11) { left: 60%; }
+            .heart:nth-child(12) { left: 90%; }
+            .heart:nth-child(13) { left: 20%; }
+            .heart:nth-child(14) { left: 50%; }
+            .heart:nth-child(15) { left: 80%; }
+        }
+
+        /* Small phones */
+        @media screen and (max-width: 480px) {
+            .loading-image {
+                max-width: 90%;
+                max-height: 25vh;
+            }
+
+            .car-image {
+                width: 60px;
+            }
+
+            .f16-image {
+                max-width: 120px;
+            }
+
+            .slideshow-title {
+                font-size: 20px;
+            }
+
+            .slide-text {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .nav-button {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .floating-hearts {
+                width: 80px;
+                padding: 15px;
+            }
+
+            .heart {
+                width: 25px;
+                height: 25px;
+            }
+
+            .heart::before,
+            .heart::after {
+                width: 25px;
+                height: 25px;
+            }
+
+            .heart::before {
+                left: -12.5px;
+            }
+
+            .heart::after {
+                top: -12.5px;
+            }
+        }
     </style>
 </head>
 <body>
